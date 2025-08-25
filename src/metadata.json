@@ -1,9 +1,9 @@
 {
-  "name": "RebootToUEFI",
-  "description": "Reboot system into UEFI",
+  "name": "Extra Reboot Options",
+  "description": "Additional quick settings entries for rebooting into Windows or UEFI firmware.",
   "license": "GPLv3",
-  "uuid": "reboottouefi@ubaygd.com",
-  "url": "https://github.com/UbayGD/reboottouefi",
+  "uuid": "extra-reboot-options@namey5.com",
+  "url": "https://github.com/namey5/extra-reboot-options",
   "shell-version": ["45", "46", "47", "48"],
-  "gettext-domain": "reboottouefi@ubaygd.com"
+  "gettext-domain": "extra-reboot-options@namey5.com"
 }

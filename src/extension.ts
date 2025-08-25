@@ -34,19 +34,23 @@ import {
 const ManagerInterface: string = `<node>
   <interface name="org.freedesktop.login1.Manager">
     <method name="SetRebootToFirmwareSetup">
-      <arg type="b" direction="in"/>
+      <arg type="b" direction="in" name="enable"/>
+    </method>
+    <method name="SetRebootToBootLoaderEntry">
+      <arg type="s" direction="in" name="boot_loader_entry"/>
     </method>
     <method name="Reboot">
-      <arg type="b" direction="in"/>
+      <arg type="b" direction="in" name="interactive"/>
     </method>
   </interface>
 </node>`;
 const Manager = Gio.DBusProxy.makeProxyWrapper(ManagerInterface);
 
-export default class RebootToUefiExtension extends Extension {
+export default class ExtraRebootOptionsExtension extends Extension {
   private menu: any;
   private proxy!: any | null;
   private rebootToUefiItem!: PopupMenu.PopupMenuItem | null;
+  private rebootToWindowsItem!: PopupMenu.PopupMenuItem | null;
   private counter!: number;
   private seconds!: number;
   private counterIntervalId!: GLib.Source;
@@ -67,31 +71,16 @@ export default class RebootToUefiExtension extends Extension {
       '/org/freedesktop/login1',
     );
 
-    this.rebootToUefiItem = new PopupMenu.PopupMenuItem(
-      `${_('Restart to UEFI')}...`,
-    );
-
-    this.rebootToUefiItem.connect('activate', () => {
-      this.counter = 60;
-      this.seconds = this.counter;
-
-      const dialog = this.buildDialog();
-      dialog.open();
-
-      this.counterIntervalId = setInterval(() => {
-        if (this.counter > 0) {
-          this.counter--;
-          if (this.counter % 10 === 0) {
-            this.seconds = this.counter;
-          }
-        } else {
-          this.clearIntervals();
-          this.reboot();
-        }
-      }, 1000);
+    this.rebootToUefiItem = this.addMenuItem(_('Restart to UEFI'), 2, () => {
+      this.rebootToUefi();
     });
-
-    this.menu.addMenuItem(this.rebootToUefiItem, 2);
+    this.rebootToWindowsItem = this.addMenuItem(
+      _('Restart to Windows'),
+      3,
+      () => {
+        this.rebootToWindows();
+      },
+    );
   }
 
   private queueModifySystemItem(): void {
@@ -115,6 +104,8 @@ export default class RebootToUefiExtension extends Extension {
     this.clearIntervals();
     this.rebootToUefiItem?.destroy();
     this.rebootToUefiItem = null;
+    this.rebootToWindowsItem?.destroy();
+    this.rebootToWindowsItem = null;
     this.proxy = null;
     if (this.sourceId) {
       GLib.Source.remove(this.sourceId);
@@ -122,12 +113,49 @@ export default class RebootToUefiExtension extends Extension {
     }
   }
 
-  private reboot(): void {
+  private rebootToUefi(): void {
     this.proxy?.SetRebootToFirmwareSetupRemote(true);
     this.proxy?.RebootRemote(false);
   }
 
-  private buildDialog(): ModalDialog.ModalDialog {
+  private rebootToWindows(): void {
+    this.proxy?.SetRebootToBootLoaderEntryRemote('auto-windows');
+    this.proxy?.RebootRemote(false);
+  }
+
+  private addMenuItem(
+    name: string,
+    order: number,
+    reboot: () => void,
+  ): PopupMenu.PopupMenuItem {
+    let menuItem = new PopupMenu.PopupMenuItem(`${name}...`);
+    menuItem.connect('activate', () => {
+      this.counter = 60;
+      this.seconds = this.counter;
+
+      const dialog = this.buildDialog(name, reboot);
+      dialog.open();
+
+      this.counterIntervalId = setInterval(() => {
+        if (this.counter > 0) {
+          this.counter--;
+          if (this.counter % 10 === 0) {
+            this.seconds = this.counter;
+          }
+        } else {
+          this.clearIntervals();
+          reboot();
+        }
+      }, 1000);
+    });
+    this.menu.addMenuItem(menuItem, order);
+    return menuItem;
+  }
+
+  private buildDialog(
+    title: string,
+    reboot: () => void,
+  ): ModalDialog.ModalDialog {
     const dialog = new ModalDialog.ModalDialog({ styleClass: 'modal-dialog' });
     dialog.setButtons([
       {
@@ -143,14 +171,14 @@ export default class RebootToUefiExtension extends Extension {
         label: _('Restart'),
         action: () => {
           this.clearIntervals();
-          this.reboot();
+          reboot();
         },
         default: false,
       },
     ]);
 
     const dialogTitle = new St.Label({
-      text: _('Restart to UEFI'),
+      text: title,
       // style_class: 'dialog-title' // TODO investigate why css classes are not working
       style: 'font-weight: bold;font-size:18px',
     });

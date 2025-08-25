@@ -1,16 +1,12 @@
-# Reboot to UEFI
+# Extra Reboot Options
 
-This is a small Gnome extension that adds the ability to reboot directly to the UEFI.
+This is a small Gnome extension that adds the ability to reboot directly to a dualbooted Windows install or the UEFI firmware.
 
-![Screenshot of the extension option in the Gnome 46 menu](images/gnome_46.png)
+![Screenshot of the extension option in the Gnome 48 menu](images/gnome_48.png)
 
-<br>
+Currently the Windows option is hardcoded to boot into `auto-windows`, the auto-detected default for `systemd-boot`.
 
-# Gnome Extensions
-
-This extension is available in [GNOME Extensions](https://extensions.gnome.org/extension/5105/reboottouefi/).
-
-<br>
+This is a fork of UbayGD's wonderful [Reboot to UEFI extension](https://github.com/UbayGD/reboottouefi) (also available in [GNOME Extensions](https://extensions.gnome.org/extension/5105/reboottouefi/)).
 
 ### Build and install the extension
 

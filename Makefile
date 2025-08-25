@@ -1,5 +1,5 @@
-NAME=reboottouefi
-DOMAIN=ubaygd.com
+NAME=extra-reboot-options
+DOMAIN=namey5.com
 
 .PHONY: all pack install clean
 
