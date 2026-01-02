@@ -1,19 +1,19 @@
 {
-  "name": "reboot-to-uefi",
-  "version": "1.0.1",
-  "description": "This is a small Gnome extension that adds the ability to reboot directly to the UEFI.",
+  "name": "extra-reboot-options",
+  "version": "2.0.0",
+  "description": "GNOME shell extension to add all known DBus bootloader entries (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu.",
   "type": "module",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/example/my-extension.git"
+    "url": "git+https://github.com/Namey5/extra-reboot-options.git"
   },
-  "author": "UbayGD <aubay.glezdiaz@gmail.com>",
+  "author": "Alex Threlfo <namey5@hotmail.com>",
   "license": "GPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/UbayGD/reboottouefi/issues"
+    "url": "https://github.com/Namey5/extra-reboot-options/issues"
   },
-  "homepage": "https://github.com/UbayGD/reboottouefi",
+  "homepage": "https://github.com/Namey5/extra-reboot-options",
   "sideEffects": false,
   "devDependencies": {
     "eslint": "^8.57.0",
