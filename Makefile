@@ -18,7 +18,7 @@ compile-po: po/*.po
 	done
 
 $(NAME)@$(DOMAIN).zip: dist/extension.js
-	@cp src/metadata.json dist/
+	@cp src/metadata.json LICENSE README.md dist/
 	@$(MAKE) compile-po
 	@(cd dist && zip ../$(NAME)@$(DOMAIN).zip -9r .)
 
