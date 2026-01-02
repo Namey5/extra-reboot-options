@@ -1,9 +1,15 @@
 {
   "name": "Extra Reboot Options",
-  "description": "Additional quick settings entries for rebooting into Windows or UEFI firmware.",
+  "description": "GNOME shell extension to add all known DBus bootloader entries (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu.",
   "license": "GPLv3",
   "uuid": "extra-reboot-options@namey5.com",
   "url": "https://github.com/namey5/extra-reboot-options",
-  "shell-version": ["45", "46", "47", "48", "49"],
+  "shell-version": [
+    "45",
+    "46",
+    "47",
+    "48",
+    "49"
+  ],
   "gettext-domain": "extra-reboot-options@namey5.com"
 }

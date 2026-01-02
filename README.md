@@ -1,12 +1,11 @@
 # Extra Reboot Options
 
-This is a small Gnome extension that adds the ability to reboot directly to a dualbooted Windows install or the UEFI firmware.
+This is a GNOME shell extension to add [all known DBus bootloader entries](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#--boot-loader-entry=ID) (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu.
 
-![Screenshot of the extension option in the Gnome 48 menu](images/gnome_48.png)
+<img width="411" height="437" alt="Additional option in power menu." src="https://github.com/user-attachments/assets/45141062-bb5f-4f95-9573-e554bd5bc695" />
+<img width="463" height="510" alt="Popup with multiple reboot options" src="https://github.com/user-attachments/assets/a5dfe6ee-0e94-4e18-ac19-e7d77596d202" />
 
-Currently the Windows option is hardcoded to boot into `auto-windows`, the auto-detected default for `systemd-boot`.
-
-This is a fork of UbayGD's wonderful [Reboot to UEFI extension](https://github.com/UbayGD/reboottouefi) (also available in [GNOME Extensions](https://extensions.gnome.org/extension/5105/reboottouefi/)).
+This was originally forked from [UbayGD/RebootToUEFI](https://github.com/UbayGD/reboottouefi).
 
 ### Build and install the extension
 
