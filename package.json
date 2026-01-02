@@ -1,6 +1,6 @@
 {
   "name": "reboot-to-uefi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is a small Gnome extension that adds the ability to reboot directly to the UEFI.",
   "type": "module",
   "private": true,
