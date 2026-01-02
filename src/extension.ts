@@ -129,6 +129,13 @@ export default class ExtraRebootOptionsExtension extends Extension {
       });
     });
 
+    if (this.rebootOptions.length == 0) {
+      console.warn(
+        'No available bootloader entries; disabling extra-reboot-options...',
+      );
+      return;
+    }
+
     let menu = (
       panel.statusArea.quickSettings._system as QuickSettings.SystemIndicator
     ).quickSettingsItems[0].menu;
