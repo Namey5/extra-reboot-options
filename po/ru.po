@@ -16,18 +16,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Generator: Gtranslator 40.0\n"
 
-#: extension.js:62,149
-msgid "Restart to UEFI"
-msgstr "Перезапуск в UEFI"
-
-#: extension.js:130
+#: extension.js:237
 msgid "Cancel"
 msgstr "Отмена"
 
-#: extension.js:139
+#: extension.js:170
 msgid "Restart"
 msgstr "Перезапуск"
-
-#: extension.js:181
-msgid "The system will restart automatically in %d seconds."
-msgstr "Система автоматически перезагрузится через %d секунд."

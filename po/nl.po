@@ -17,18 +17,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Lokalize 22.08.3\n"
 
-#: extension.js:63,122
-msgid "Restart to UEFI"
-msgstr "Herstarten naar UEFI"
-
-#: extension.js:103
+#: extension.js:237
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: extension.js:112
+#: extension.js:170
 msgid "Restart"
 msgstr "Herstarten"
-
-#: extension.js:154
-msgid "The system will restart automatically in %d seconds."
-msgstr "De computer wordt over %d seconden herstart."

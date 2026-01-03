@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -17,18 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:63,122
-msgid "Restart to UEFI"
+#: extension.js:85
+msgid "UEFI Firmware"
 msgstr ""
 
-#: extension.js:103
+#: extension.js:237
 msgid "Cancel"
 msgstr ""
 
-#: extension.js:112
+#: extension.js:170
 msgid "Restart"
 msgstr ""
 
-#: extension.js:154
-msgid "The system will restart automatically in %d seconds."
+#: extension.js:179
+msgid "Select a boot-loadei entry for next restart."
 msgstr ""
