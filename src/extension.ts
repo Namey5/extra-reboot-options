@@ -34,6 +34,7 @@ import {
   gettext as _,
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+// www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
 const loginManagerInterface: string = `<node>
   <interface name="org.freedesktop.login1.Manager">
     <property name="BootLoaderEntries" type="as" access="read"/>
@@ -51,7 +52,7 @@ const loginManagerInterface: string = `<node>
     </method>
   </interface>
 </node>`;
-interface LoginManager {
+interface LoginManager extends Gio.DBusProxy {
   BootLoaderEntries: string[];
   CanRebootToFirmwareSetupSync(): 'yes' | 'challenge' | 'no' | 'na';
   SetRebootToFirmwareSetupSync(enable: boolean): void;
@@ -61,56 +62,30 @@ interface LoginManager {
 const LoginManagerProxy = Gio.DBusProxy.makeProxyWrapper(loginManagerInterface);
 
 export default class ExtraRebootOptionsExtension extends Extension {
-  private systemActions: SystemActions.SystemActions;
-  private loginManager: LoginManager;
+  private systemActions: SystemActions.SystemActions | undefined;
+  private loginManager: LoginManager | undefined;
   private rebootOptions: Dialog.ButtonInfo[] = [];
   private menuItem: PopupMenuItem | undefined;
   private sourceId: number | null = null;
 
   constructor(metadata: any) {
     super(metadata);
+  }
 
+  enable(): void {
     this.systemActions = SystemActions.getDefault();
     this.loginManager = LoginManagerProxy(
       Gio.DBus.system,
       'org.freedesktop.login1',
       '/org/freedesktop/login1',
-    ) as unknown as LoginManager;
-  }
+    ) as LoginManager;
 
-  enable(): void {
-    if (!panel.statusArea.quickSettings._system) {
-      this.queueModifySystemItem();
-    } else {
-      this.modifySystemItem();
-    }
-  }
-
-  disable(): void {
-    this.menuItem?.destroy();
-    this.menuItem = undefined;
-    this.rebootOptions = [];
-    if (this.sourceId) {
-      GLib.Source.remove(this.sourceId);
-      this.sourceId = null;
-    }
-  }
-
-  private queueModifySystemItem(): void {
-    this.sourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-      if (!panel.statusArea.quickSettings._system) return GLib.SOURCE_CONTINUE;
-      this.modifySystemItem();
-      return GLib.SOURCE_REMOVE;
-    });
-  }
-
-  private modifySystemItem(): void {
     if (this.loginManager.CanRebootToFirmwareSetupSync() == 'yes') {
       this.rebootOptions.push({
         label: _('UEFI Firmware'),
         action: () => {
           this.reboot((cancel: boolean) => {
-            this.loginManager.SetRebootToFirmwareSetupSync(!cancel);
+            this.loginManager!.SetRebootToFirmwareSetupSync(!cancel);
           });
         },
       });
@@ -121,7 +96,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
         label: entry,
         action: () => {
           this.reboot((cancel: boolean) => {
-            this.loginManager.SetRebootToBootLoaderEntrySync(
+            this.loginManager!.SetRebootToBootLoaderEntrySync(
               cancel ? '' : entry,
             );
           });
@@ -136,12 +111,42 @@ export default class ExtraRebootOptionsExtension extends Extension {
       return;
     }
 
-    let menu = (
-      panel.statusArea.quickSettings._system as QuickSettings.SystemIndicator
-    ).quickSettingsItems[0].menu;
-    this.menuItem = new PopupMenuItem('More...');
-    this.menuItem.connect('activate', () => this.showRebootOptionsDialog());
-    menu.addMenuItem(this.menuItem, 3);
+    this.whenQuickSettingsReady(() => {
+      let menu = (
+        panel.statusArea.quickSettings._system as QuickSettings.SystemIndicator
+      ).quickSettingsItems[0].menu;
+      this.menuItem = new PopupMenuItem(_('More...'));
+      this.menuItem.connect('activate', () => this.showRebootOptionsDialog());
+      menu.addMenuItem(this.menuItem, 3);
+    });
+  }
+
+  disable(): void {
+    if (this.menuItem) {
+      this.menuItem.destroy();
+      this.menuItem = undefined;
+    }
+    if (this.sourceId) {
+      GLib.Source.remove(this.sourceId);
+      this.sourceId = null;
+    }
+    this.rebootOptions = [];
+  }
+
+  private whenQuickSettingsReady(action: () => void): void {
+    if (panel.statusArea.quickSettings._system) {
+      action();
+      return;
+    }
+
+    this.sourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+      if (panel.statusArea.quickSettings._system) {
+        action();
+        return GLib.SOURCE_REMOVE;
+      } else {
+        return GLib.SOURCE_CONTINUE;
+      }
+    });
   }
 
   private showRebootOptionsDialog(): void {
@@ -171,7 +176,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
       headerBox.add_child(new St.Label({ text: '  ' }));
 
       let dialogMessage = new St.Label({
-        text: _('Select an entry to restart into.'),
+        text: _('Select a boot-loader entry for next restart.'),
       });
       dialogMessage.clutterText.ellipsize = Pango.EllipsizeMode.NONE;
       dialogMessage.clutterText.lineWrap = true;
@@ -189,7 +194,6 @@ export default class ExtraRebootOptionsExtension extends Extension {
       });
       let optionsLayout = new St.BoxLayout({
         styleClass: 'modal-dialog-button-box',
-        style: 'spacing: 1em',
         xAlign: Clutter.ActorAlign.CENTER,
         vertical: true,
       });
