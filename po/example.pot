@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:85
-msgid "UEFI Firmware"
+#: extension.js:118
+msgid "More..."
 msgstr ""
 
 #: extension.js:237
@@ -26,6 +26,10 @@ msgstr ""
 
 #: extension.js:170
 msgid "Restart"
+msgstr ""
+
+#: extension.js:85
+msgid "UEFI Firmware"
 msgstr ""
 
 #: extension.js:179
