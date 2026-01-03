@@ -29,5 +29,5 @@ msgid "Restart"
 msgstr ""
 
 #: extension.js:179
-msgid "Select a boot-loadei entry for next restart."
+msgid "Select a boot-loader entry for next restart."
 msgstr ""
