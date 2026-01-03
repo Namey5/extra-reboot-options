@@ -194,6 +194,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
       });
       let optionsLayout = new St.BoxLayout({
         styleClass: 'modal-dialog-button-box',
+        style: 'spacing: 1em',
         xAlign: Clutter.ActorAlign.CENTER,
         vertical: true,
       });
