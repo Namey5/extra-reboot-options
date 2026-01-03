@@ -154,7 +154,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
       styleClass: 'modal-dialog',
     });
 
-    // Message:
+    // Message Header:
     {
       let headerBox = new St.BoxLayout({
         xAlign: Clutter.ActorAlign.CENTER,
@@ -185,7 +185,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
 
       dialog.contentLayout.add_child(headerBox);
     }
-    // Reboot Options:
+    // Reboot Options (same implementation as ModalDialog.setButtons(), but in a vertical scrollview):
     {
       let optionsContainer = new St.ScrollView({
         styleClass: 'dialog-list-scrollview',
@@ -217,7 +217,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
       optionsContainer.set_child(optionsLayout);
       dialog.contentLayout.add_child(optionsContainer);
     }
-    // Separator:
+    // Separator (borrowed from quick settings):
     {
       let separator = new St.Bin({
         styleClass: 'popup-separator-menu-item',
@@ -246,7 +246,12 @@ export default class ExtraRebootOptionsExtension extends Extension {
 
   private reboot(prepareReboot: (cancel: boolean) => void): void {
     try {
+      // Ideally we would wait for the reboot signal and then apply reboot options,
+      // but currently its easier to just apply them now and revert if the reboot
+      // is cancelled/fails.
       prepareReboot(false);
+      // Gjs types are incomplete here but SystemActions.ActivateReboot() consumes errors anyway,
+      // so we need to use the underlying DBus message to get the request result.
       (this.systemActions as any)._session
         .RebootAsync()
         .catch(() => prepareReboot(true));
