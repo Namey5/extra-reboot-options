@@ -2,7 +2,7 @@
   "name": "Extra Reboot Options",
   "description": "GNOME shell extension to add all known bootloader entries (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu via systemd.",
   "license": "GPLv3",
-  "uuid": "extra-reboot-options@namey5.com",
+  "uuid": "extra-reboot-options@namey5",
   "url": "https://github.com/namey5/extra-reboot-options",
   "shell-version": [
     "45",
@@ -11,5 +11,5 @@
     "48",
     "49"
   ],
-  "gettext-domain": "extra-reboot-options@namey5.com"
+  "gettext-domain": "extra-reboot-options@namey5"
 }

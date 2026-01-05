@@ -8,7 +8,7 @@ This is a GNOME shell extension to add [all known bootloader entries](https://ww
 > This extension was originally forked from [UbayGD/RebootToUEFI](https://github.com/UbayGD/reboottouefi).
 
 ## Installation
-Fetch a build of `extra-reboot-options@namey5.com.zip` from [Releases](https://github.com/Namey5/extra-reboot-options/releases) and extract it to:
+Fetch a build of `extra-reboot-options@namey5.zip` from [Releases](https://github.com/Namey5/extra-reboot-options/releases) and extract it to:
 ```
 ~/.local/share/gnome-shell/extensions
 ```
