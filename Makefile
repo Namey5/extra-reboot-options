@@ -1,5 +1,5 @@
 NAME=extra-reboot-options
-DOMAIN=namey5.com
+DOMAIN=namey5
 
 .PHONY: all pack install clean
 
