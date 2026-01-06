@@ -85,7 +85,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
         label: _('UEFI Firmware'),
         action: () => {
           this.reboot((cancel: boolean) => {
-            this.loginManager!.SetRebootToFirmwareSetupSync(!cancel);
+            this.loginManager?.SetRebootToFirmwareSetupSync(!cancel);
           });
         },
       });
@@ -96,7 +96,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
         label: entry,
         action: () => {
           this.reboot((cancel: boolean) => {
-            this.loginManager!.SetRebootToBootLoaderEntrySync(
+            this.loginManager?.SetRebootToBootLoaderEntrySync(
               cancel ? '' : entry,
             );
           });
@@ -131,6 +131,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
       this.sourceId = null;
     }
     this.rebootOptions = [];
+    this.loginManager = undefined;
   }
 
   private whenQuickSettingsReady(action: () => void): void {
