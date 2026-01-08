@@ -2,13 +2,19 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "outDir": "./dist",
+    "outDir": "./out/dist",
     "sourceMap": false,
     "strict": true,
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "skipLibCheck": true
   },
-  "include": ["ambient.d.ts"],
-  "files": ["src/extension.ts"]
+  "include": [
+    "src/ambient.d.ts"
+  ],
+  "files": [
+    "src/extension.ts"
+  ]
 }

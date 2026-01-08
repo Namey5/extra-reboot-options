@@ -1,5 +1,2 @@
-.build/
-dist/
+out/
 node_modules/
-extra-reboot-options@namey5.shell-extension.zip
-extra-reboot-options@namey5.zip

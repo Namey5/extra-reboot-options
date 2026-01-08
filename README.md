@@ -19,10 +19,10 @@ Then enable `Extra Reboot Options` from https://extensions.gnome.org/local/ or t
 
 ## Building
 Requirements:
-
 - make
 - nodejs and npm
 - gettext
+- gnome-extensions
 
 To build the extension run the following command:
 

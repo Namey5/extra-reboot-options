@@ -1,34 +1,33 @@
-NAME=extra-reboot-options
 DOMAIN=namey5
+EXTENSION_NAME=extra-reboot-options
+BUNDLE_ID=$(EXTENSION_NAME)@$(DOMAIN)
+BUNDLE_ZIP=$(BUNDLE_ID).shell-extension.zip
 
 .PHONY: all pack install clean
 
-all: dist/extension.js
+all: out/dist/extension.js
 
-node_modules: package.json
+node_modules/.package-lock.json: package.json
 	npm install
 
-dist/extension.js: node_modules
-	@ ./node_modules/typescript/bin/tsc
+out/dist/extension.js: node_modules/.package-lock.json src/extension.ts
+	npm run build
 
-compile-po: po/*.po
-	@for file in po/*.po; do \
-		mkdir -p dist/locale/$$(basename $$file .po)/LC_MESSAGES; \
-		msgfmt -o dist/locale/$$(basename $$file .po)/LC_MESSAGES/$(NAME)@$(DOMAIN).mo $$file; \
-	done
+out/dist/metadata.json: src/metadata.json
+	@cp src/metadata.json out/dist/metadata.json
 
-$(NAME)@$(DOMAIN).zip: dist/extension.js
-	@cp src/metadata.json LICENSE README.md dist/
-	@$(MAKE) compile-po
-	@(cd dist && zip ../$(NAME)@$(DOMAIN).zip -9r .)
+out/$(BUNDLE_ZIP): out/dist/extension.js out/dist/metadata.json po/* README.md LICENSE
+	gnome-extensions pack out/dist \
+		--force \
+		--podir="../../po" \
+		--extra-source="../../README.md" \
+		--extra-source="../../LICENSE" \
+		-o out
 
-pack: $(NAME)@$(DOMAIN).zip
+pack: out/$(BUNDLE_ZIP)
 
-install: $(NAME)@$(DOMAIN).zip
-	@[ -d ~/.local/share/gnome-shell/extensions ] || mkdir -p ~/.local/share/gnome-shell/extensions
-	@touch ~/.local/share/gnome-shell/extensions/$(NAME)@$(DOMAIN)
-	@rm -rf ~/.local/share/gnome-shell/extensions/$(NAME)@$(DOMAIN)
-	@mv dist ~/.local/share/gnome-shell/extensions/$(NAME)@$(DOMAIN)
+install: out/$(BUNDLE_ZIP)
+	gnome-extensions install --force out/$(BUNDLE_ZIP)
 
 clean:
-	@rm -rf dist node_modules $(NAME)@$(DOMAIN).zip
+	@rm -rf out node_modules
