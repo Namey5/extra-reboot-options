@@ -4,11 +4,8 @@
   "uuid": "extra-reboot-options@namey5",
   "url": "https://github.com/namey5/extra-reboot-options",
   "shell-version": [
-    "45",
-    "46",
-    "47",
-    "48",
     "49"
   ],
-  "gettext-domain": "extra-reboot-options@namey5"
+  "gettext-domain": "extra-reboot-options@namey5",
+  "version-name": "2.1.0"
 }
