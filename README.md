@@ -17,19 +17,23 @@ Then enable `Extra Reboot Options` from https://extensions.gnome.org/local/ or t
 > [!IMPORTANT]
 > If the `More...` option does not show up in your power menu, your bootloader may not be supported by `systemctl reboot`.
 
+## Requirements
+
+| Dependency | Tested Version |
+| ----- | ----- |
+| GNU Make | 4.4.1 |
+| NodeJS + npm | 11.7.0 |
+| gettext | 0.26 |
+| gnome-extensions | 49.2 |
+
 ## Building
-Requirements:
-- make
-- nodejs and npm
-- gettext
-- gnome-extensions
-
 To build the extension run the following command:
-
-`$ make pack`
-
-If all goes well this will generate a zip file in the project folder.
+```bash
+make pack
+```
+If all goes well this will generate a zip file in the `./out` folder.
 
 To install the extension just run the following command:
-
-`$ make install`
+```bash
+make install
+```
