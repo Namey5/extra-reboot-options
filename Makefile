@@ -12,6 +12,8 @@ node_modules/.package-lock.json: package.json
 
 out/dist/extension.js: node_modules/.package-lock.json src/extension.ts
 	npm run build
+	# tsc strips line breaks in emitted js - need to add back for EGO review
+	npx eslint out --config format.eslint.config.js --fix
 
 out/dist/metadata.json: src/metadata.json
 	@cp src/metadata.json out/dist/metadata.json
