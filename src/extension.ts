@@ -62,7 +62,6 @@ interface LoginManager extends Gio.DBusProxy {
 const LoginManagerProxy = Gio.DBusProxy.makeProxyWrapper(loginManagerInterface);
 
 export default class ExtraRebootOptionsExtension extends Extension {
-  private systemActions: SystemActions.SystemActions | undefined;
   private loginManager: LoginManager | undefined;
   private rebootOptions: Dialog.ButtonInfo[] = [];
   private menuItem: PopupMenuItem | undefined;
@@ -73,7 +72,6 @@ export default class ExtraRebootOptionsExtension extends Extension {
   }
 
   enable(): void {
-    this.systemActions = SystemActions.getDefault();
     this.loginManager = LoginManagerProxy(
       Gio.DBus.system,
       'org.freedesktop.login1',
@@ -148,6 +146,22 @@ export default class ExtraRebootOptionsExtension extends Extension {
         return GLib.SOURCE_CONTINUE;
       }
     });
+  }
+
+  private reboot(prepareReboot: (cancel: boolean) => void): void {
+    try {
+      // Ideally we would wait for the reboot signal and then apply reboot options,
+      // but currently its easier to just apply them now and revert if the reboot
+      // is cancelled/fails.
+      prepareReboot(false);
+      // Gjs types are incomplete here but SystemActions.ActivateReboot() consumes errors anyway,
+      // so we need to use the underlying DBus message to get the request result.
+      (SystemActions.getDefault() as any)._session
+        .RebootAsync()
+        .catch(() => prepareReboot(true));
+    } catch {
+      prepareReboot(true);
+    }
   }
 
   private showRebootOptionsDialog(): void {
@@ -243,21 +257,5 @@ export default class ExtraRebootOptionsExtension extends Extension {
     });
 
     dialog.open();
-  }
-
-  private reboot(prepareReboot: (cancel: boolean) => void): void {
-    try {
-      // Ideally we would wait for the reboot signal and then apply reboot options,
-      // but currently its easier to just apply them now and revert if the reboot
-      // is cancelled/fails.
-      prepareReboot(false);
-      // Gjs types are incomplete here but SystemActions.ActivateReboot() consumes errors anyway,
-      // so we need to use the underlying DBus message to get the request result.
-      (this.systemActions as any)._session
-        .RebootAsync()
-        .catch(() => prepareReboot(true));
-    } catch {
-      prepareReboot(true);
-    }
   }
 }
