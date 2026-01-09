@@ -1,7 +1,7 @@
 {
   "name": "extra-reboot-options",
   "version": "2.1.1",
-  "description": "GNOME shell extension to add all known bootloader entries (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu via systemd.",
+  "description": "GNOME shell extension to add all known EFI bootloader entries (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu via systemd.",
   "type": "module",
   "private": true,
   "repository": {
