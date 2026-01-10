@@ -39,3 +39,6 @@ msgstr ""
 
 msgid "Select a boot-loader entry for next restart."
 msgstr ""
+
+msgid "No supported boot-loader entries found."
+msgstr ""

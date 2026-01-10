@@ -126,13 +126,6 @@ export default class ExtraRebootOptionsExtension extends Extension {
       });
     }
 
-    if (this.rebootOptions.length == 0) {
-      console.warn(
-        'No available bootloader entries; disabling extra-reboot-options...',
-      );
-      return;
-    }
-
     this.getPowerSettingsMenu(powerMenu => {
       this.menuItem = new PopupMenuItem(_('More...'));
       this.menuItem.connect('activate', () => this.showRebootOptionsDialog());
@@ -198,41 +191,42 @@ export default class ExtraRebootOptionsExtension extends Extension {
     // Message Header:
     {
       let headerBox = new St.BoxLayout({
+        styleClass: 'message-dialog-content',
         xAlign: Clutter.ActorAlign.CENTER,
         yExpand: true,
         vertical: true,
       });
 
-      const titleBox = new St.BoxLayout({
-        xAlign: Clutter.ActorAlign.CENTER,
-      });
-      titleBox.add_child(new St.Label({ text: '  ' }));
       const dialogTitle = new St.Label({
+        styleClass: 'message-dialog-title',
         text: _('Restart'),
-        style: 'font-weight: bold;font-size:18px',
       });
-      titleBox.add_child(dialogTitle);
-
-      headerBox.add_child(titleBox);
-      headerBox.add_child(new St.Label({ text: '  ' }));
+      headerBox.add_child(dialogTitle);
 
       let dialogMessage = new St.Label({
-        text: _('Select a boot-loader entry for next restart.'),
+        styleClass: 'message-dialog-description',
+        text:
+          this.rebootOptions.length > 0
+            ? _('Select a boot-loader entry for next restart.')
+            : _('No supported boot-loader entries found.'),
       });
       dialogMessage.clutterText.ellipsize = Pango.EllipsizeMode.NONE;
       dialogMessage.clutterText.lineWrap = true;
-
       headerBox.add_child(dialogMessage);
 
       dialog.contentLayout.add_child(headerBox);
     }
     // Reboot Options (same implementation as ModalDialog.setButtons(), but in a vertical scrollview):
-    {
+    if (this.rebootOptions.length > 0) {
+      let container = new St.Bin({ styleClass: 'dialog-list' });
+
       let optionsContainer = new St.ScrollView({
         styleClass: 'dialog-list-scrollview',
         hscrollbarPolicy: St.PolicyType.NEVER,
         vscrollbarPolicy: St.PolicyType.AUTOMATIC,
       });
+      optionsContainer.add_effect(new St.ScrollViewFade({}));
+
       let optionsLayout = new St.BoxLayout({
         styleClass: 'modal-dialog-button-box',
         style: 'spacing: 1em',
@@ -256,10 +250,11 @@ export default class ExtraRebootOptionsExtension extends Extension {
         optionsLayout.add_child(button);
       }
       optionsContainer.set_child(optionsLayout);
-      dialog.contentLayout.add_child(optionsContainer);
-    }
-    // Separator (borrowed from quick settings):
-    {
+
+      container.set_child(optionsContainer);
+      dialog.contentLayout.add_child(container);
+
+      // Separator (borrowed from quick settings):
       let separator = new St.Bin({
         styleClass: 'popup-separator-menu-item',
         xExpand: true,
