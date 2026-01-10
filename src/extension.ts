@@ -133,13 +133,10 @@ export default class ExtraRebootOptionsExtension extends Extension {
       return;
     }
 
-    this.whenQuickSettingsReady(() => {
-      let menu = (
-        panel.statusArea.quickSettings._system as QuickSettings.SystemIndicator
-      ).quickSettingsItems[0].menu;
+    this.getPowerSettingsMenu(powerMenu => {
       this.menuItem = new PopupMenuItem(_('More...'));
       this.menuItem.connect('activate', () => this.showRebootOptionsDialog());
-      menu.addMenuItem(this.menuItem, 3);
+      powerMenu.addMenuItem(this.menuItem, 3);
     });
   }
 
@@ -156,20 +153,25 @@ export default class ExtraRebootOptionsExtension extends Extension {
     this.loginManager = undefined;
   }
 
-  private whenQuickSettingsReady(action: () => void): void {
-    if (panel.statusArea.quickSettings._system) {
-      action();
-      return;
-    }
-
-    this.sourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+  private getPowerSettingsMenu(
+    action: (powerMenu: QuickSettings.QuickToggleMenu) => void,
+  ): void {
+    let getMenu = () => {
       if (panel.statusArea.quickSettings._system) {
-        action();
-        return GLib.SOURCE_REMOVE;
+        action(
+          panel.statusArea.quickSettings._system.quickSettingsItems[0].menu,
+        );
+        return true;
       } else {
-        return GLib.SOURCE_CONTINUE;
+        return false;
       }
-    });
+    };
+
+    if (!getMenu()) {
+      this.sourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+        return getMenu() ? GLib.SOURCE_REMOVE : GLib.SOURCE_CONTINUE;
+      });
+    }
   }
 
   private reboot(prepareReboot: (cancel: boolean) => void): void {
