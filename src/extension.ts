@@ -23,10 +23,11 @@ import Gio from 'gi://Gio';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import Pango from 'gi://Pango';
+import { dgettext } from 'gettext';
 import { panel } from 'resource:///org/gnome/shell/ui/main.js';
 import * as Dialog from 'resource:///org/gnome/shell/ui/dialog.js';
 import { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
-import { PopupMenuItem } from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as QuickSettings from 'resource:///org/gnome/shell/ui/quickSettings.js';
 import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
 import {
@@ -34,6 +35,8 @@ import {
   gettext as _,
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+// Wrapper for gettext in the shell's default domain - this will prevent our .pot from getting updated.
+const shellText = (text: string) => dgettext(null, text);
 
 // www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
 const loginManagerInterface: string = `<node>
@@ -65,7 +68,8 @@ const LoginManagerProxy = Gio.DBusProxy.makeProxyWrapper(loginManagerInterface);
 export default class ExtraRebootOptionsExtension extends Extension {
   private loginManager: LoginManager | undefined;
   private rebootOptions: Dialog.ButtonInfo[] = [];
-  private menuItem: PopupMenuItem | undefined;
+  private restartGesture: Clutter.ClickGesture | null = null;
+  private gestureHandlerId: number | null = null;
   private sourceId: number | null = null;
 
   constructor(metadata: any) {
@@ -128,21 +132,41 @@ export default class ExtraRebootOptionsExtension extends Extension {
     }
 
     this.getPowerSettingsMenu(powerMenu => {
-      this.menuItem = new PopupMenuItem(_('More...'));
-      this.menuItem.connect('activate', () => this.showRebootOptionsDialog());
-      powerMenu.addMenuItem(this.menuItem, 3);
+      let menuItems = powerMenu._getMenuItems();
+      // Find the restart button's click gesture by looking up its label.
+      // This will already be translated, so need to use the shell's gettext domain.
+      let restartLabel = shellText('Restart…');
+      this.restartGesture = (
+        menuItems.find(base => {
+          let item = base as PopupMenu.PopupMenuItem;
+          return item?.label?.text === restartLabel;
+        }) as any
+      )?._clickGesture;
+      // Hijack the click handler and inject our own custom reboot if the modifiers are met.
+      this.gestureHandlerId =
+        this.restartGesture?.connect('should-handle-sequence', (_, event) => {
+          if (
+            event.has_shift_modifier() ||
+            event.get_button() === Clutter.BUTTON_SECONDARY
+          ) {
+            this.showRebootOptionsDialog();
+            return false;
+          }
+          return true;
+        }) ?? null;
     });
   }
 
   disable(): void {
-    if (this.menuItem) {
-      this.menuItem.destroy();
-      this.menuItem = undefined;
+    if (this.gestureHandlerId) {
+      this.restartGesture?.disconnect(this.gestureHandlerId);
     }
+    this.gestureHandlerId = null;
+    this.restartGesture = null;
     if (this.sourceId) {
       GLib.Source.remove(this.sourceId);
-      this.sourceId = null;
     }
+    this.sourceId = null;
     this.rebootOptions = [];
     this.loginManager = undefined;
   }
@@ -156,9 +180,8 @@ export default class ExtraRebootOptionsExtension extends Extension {
           panel.statusArea.quickSettings._system.quickSettingsItems[0].menu,
         );
         return true;
-      } else {
-        return false;
       }
+      return false;
     };
 
     if (!getMenu()) {
