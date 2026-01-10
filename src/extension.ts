@@ -34,13 +34,6 @@ import {
   gettext as _,
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
-// https://systemd.io/BOOT_LOADER_INTERFACE/#boot-loader-entry-identifiers
-const knownBootloaderEntries: [RegExp, string][] = [
-  [/(?:auto-)?windows-?(.*)/g, 'Windows $1'],
-  [/(?:auto-)?osx-?(.*)/g, 'OSX $1'],
-  [/(?:auto-)?efi-shell/g, 'EFI Shell'],
-  [/(?:auto-)?reboot-to-firmware-setup/g, 'UEFI Firmware'],
-];
 
 // www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
 const loginManagerInterface: string = `<node>
@@ -102,15 +95,23 @@ export default class ExtraRebootOptionsExtension extends Extension {
     for (let entry of this.loginManager.BootLoaderEntries) {
       let label = entry;
       // Filter known bootloader entries.
-      for (let [search, replace] of knownBootloaderEntries) {
-        if (search.exec(entry)) {
-          label = entry.replace(search, _(replace));
+      // https://systemd.io/BOOT_LOADER_INTERFACE/#boot-loader-entry-identifiers
+      const knownBootloaderEntries: [RegExp, string][] = [
+        [/(?:auto-)?windows-?(.*)/g, _('Windows %s')],
+        [/(?:auto-)?osx-?(.*)/g, _('OSX %s')],
+        [/(?:auto-)?efi-shell/g, _('EFI Shell')],
+        [/(?:auto-)?reboot-to-firmware-setup/g, _('UEFI Firmware')],
+      ];
+      for (let [pattern, name] of knownBootloaderEntries) {
+        let regex = pattern.exec(entry);
+        if (regex) {
+          label = regex.length > 1 ? name.format(regex[1] ?? '') : name;
           break;
         }
       }
       label = label.trim();
       // Ignore firmware entry if we have already handled it.
-      if (supportsUefiReboot && label == this.rebootOptions[0].label) {
+      if (supportsUefiReboot && label === this.rebootOptions[0].label) {
         continue;
       }
 
