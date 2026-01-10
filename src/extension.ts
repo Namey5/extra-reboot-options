@@ -34,6 +34,14 @@ import {
   gettext as _,
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+// https://systemd.io/BOOT_LOADER_INTERFACE/#boot-loader-entry-identifiers
+const knownBootloaderEntries: [RegExp, string][] = [
+  [/(?:auto-)?windows-?(.*)/g, 'Windows $1'],
+  [/(?:auto-)?osx-?(.*)/g, 'OSX $1'],
+  [/(?:auto-)?efi-shell/g, 'EFI Shell'],
+  [/(?:auto-)?reboot-to-firmware-setup/g, 'UEFI Firmware'],
+];
+
 // www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
 const loginManagerInterface: string = `<node>
   <interface name="org.freedesktop.login1.Manager">
@@ -78,7 +86,9 @@ export default class ExtraRebootOptionsExtension extends Extension {
       '/org/freedesktop/login1',
     ) as LoginManager;
 
-    if (this.loginManager.CanRebootToFirmwareSetupSync() == 'yes') {
+    let supportsUefiReboot =
+      this.loginManager.CanRebootToFirmwareSetupSync() == 'yes';
+    if (supportsUefiReboot) {
       this.rebootOptions.push({
         label: _('UEFI Firmware'),
         action: () => {
@@ -89,9 +99,23 @@ export default class ExtraRebootOptionsExtension extends Extension {
       });
     }
 
-    this.loginManager.BootLoaderEntries.forEach((entry: string) => {
+    for (let entry of this.loginManager.BootLoaderEntries) {
+      let label = entry;
+      // Filter known bootloader entries.
+      for (let [search, replace] of knownBootloaderEntries) {
+        if (search.exec(entry)) {
+          label = entry.replace(search, _(replace));
+          break;
+        }
+      }
+      label = label.trim();
+      // Ignore firmware entry if we have already handled it.
+      if (supportsUefiReboot && label == this.rebootOptions[0].label) {
+        continue;
+      }
+
       this.rebootOptions.push({
-        label: entry,
+        label,
         action: () => {
           this.reboot((cancel: boolean) => {
             this.loginManager?.SetRebootToBootLoaderEntrySync(
@@ -100,7 +124,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
           });
         },
       });
-    });
+    }
 
     if (this.rebootOptions.length == 0) {
       console.warn(
@@ -213,7 +237,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
         xAlign: Clutter.ActorAlign.CENTER,
         vertical: true,
       });
-      this.rebootOptions.forEach(option => {
+      for (let option of this.rebootOptions) {
         let button = new St.Button({
           styleClass: 'modal-dialog-button',
           buttonMask: St.ButtonMask.ONE | St.ButtonMask.THREE,
@@ -228,7 +252,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
           option.action();
         });
         optionsLayout.add_child(button);
-      });
+      }
       optionsContainer.set_child(optionsLayout);
       dialog.contentLayout.add_child(optionsContainer);
     }
