@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-10 23:24+1100\n"
+"POT-Creation-Date: 2026-01-11 17:45+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,36 +17,36 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/extension.ts:90 src/extension.ts:107
+#: src/extension.ts:91 src/extension.ts:108
 msgid "UEFI Firmware"
-msgstr ""
-
-#: src/extension.ts:104
-#, javascript-format
-msgid "Windows %s"
 msgstr ""
 
 #: src/extension.ts:105
 #, javascript-format
-msgid "OSX %s"
+msgid "Windows %s"
 msgstr ""
 
 #: src/extension.ts:106
+#, javascript-format
+msgid "OSX %s"
+msgstr ""
+
+#: src/extension.ts:107
 msgid "EFI Shell"
 msgstr ""
 
-#: src/extension.ts:223
+#: src/extension.ts:256
 msgid "Restart"
 msgstr ""
 
-#: src/extension.ts:231
+#: src/extension.ts:264
 msgid "Select a boot-loader entry for next restart."
 msgstr ""
 
-#: src/extension.ts:232
+#: src/extension.ts:265
 msgid "No supported boot-loader entries found."
 msgstr ""
 
-#: src/extension.ts:295
+#: src/extension.ts:313
 msgid "Cancel"
 msgstr ""
