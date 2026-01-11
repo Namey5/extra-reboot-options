@@ -2,16 +2,18 @@
 
 [![extensions.gnome.org](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fextensions.gnome.org%2Fextension%2F9135%2Fextra-reboot-options%2F&search=(%5Cd%2B)%20downloads&logo=gnome&label=extensions.gnome.org)](https://extensions.gnome.org/extension/9135/extra-reboot-options/)
 
-This is a GNOME shell extension to add [all known bootloader entries](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#--boot-loader-entry=ID) (UEFI firmware, Windows dual-boot, etc.) to the quick-settings power menu via `systemd`.
+This is a GNOME shell extension to show all [`systemd`-supported bootloader entries](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#--boot-loader-entry=ID) (UEFI firmware, Windows dual-boot, etc.) when right-clicking (or shift-clicking) the `Restart...` button in the quick-settings power menu.
 
 > [!IMPORTANT]
 > The `systemd` bootloader interface is [only supported on EFI systems](https://systemd.io/BOOT_LOADER_INTERFACE/).
-> If the `More...` option does not show up in your power menu, your bootloader may not be supported by `systemctl reboot`.
+> If the right-click icon does not show up on the `Restart...` button, your bootloader may not be supported by `systemctl reboot`.
 > 
 > This has been tested with `systemd-boot` on [EndeavourOS](https://endeavouros.com/) running GNOME 49.
 
-<img width="411" height="437" alt="Additional option in power menu." src="https://github.com/user-attachments/assets/45141062-bb5f-4f95-9573-e554bd5bc695" />
-<img width="463" height="510" alt="Popup with multiple reboot options" src="https://github.com/user-attachments/assets/a5dfe6ee-0e94-4e18-ac19-e7d77596d202" />
+<p align="center">
+  <img width="427" height="671" alt="Altered restart button in power menu" src="https://github.com/user-attachments/assets/7fdd22e6-e972-4f08-8342-d915c7e53041" />
+  <img width="476" height="425" alt="Popup with multiple reboot options" src="https://github.com/user-attachments/assets/59299398-ab49-47a2-a953-7f58f925b14a" />
+</p>
 
 > [!NOTE]
 > This extension was originally forked from [UbayGD/RebootToUEFI](https://github.com/UbayGD/reboottouefi).
