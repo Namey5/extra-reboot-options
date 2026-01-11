@@ -69,6 +69,7 @@ export default class ExtraRebootOptionsExtension extends Extension {
   private loginManager: LoginManager | undefined;
   private rebootOptions: Dialog.ButtonInfo[] = [];
   private restartGesture: Clutter.ClickGesture | null = null;
+  private injectedIcon: St.Icon | null = null;
   private gestureHandlerId: number | null = null;
   private sourceId: number | null = null;
 
@@ -136,12 +137,19 @@ export default class ExtraRebootOptionsExtension extends Extension {
       // Find the restart button's click gesture by looking up its label.
       // This will already be translated, so need to use the shell's gettext domain.
       let restartLabel = shellText('Restart…');
-      this.restartGesture = (
-        menuItems.find(base => {
-          let item = base as PopupMenu.PopupMenuItem;
-          return item?.label?.text === restartLabel;
-        }) as any
-      )?._clickGesture;
+      let restartButton = menuItems.find(base => {
+        let item = base as PopupMenu.PopupMenuItem;
+        return item?.label?.text === restartLabel;
+      }) as PopupMenu.PopupMenuItem;
+
+      if (!restartButton) {
+        console.error(
+          `could not find restart button with label '${restartLabel}'`,
+        );
+        return;
+      }
+
+      this.restartGesture = (restartButton as any)._clickGesture;
       // Hijack the click handler and inject our own custom reboot if the modifiers are met.
       this.gestureHandlerId =
         this.restartGesture?.connect('should-handle-sequence', (_, event) => {
@@ -154,10 +162,23 @@ export default class ExtraRebootOptionsExtension extends Extension {
           }
           return true;
         }) ?? null;
+
+      if (this.gestureHandlerId) {
+        this.injectedIcon = new St.Icon({
+          gicon: this.getIcon('mouse-secondary-click-symbolic'),
+          xExpand: true,
+          xAlign: Clutter.ActorAlign.END,
+        });
+        restartButton.add_child(this.injectedIcon);
+      }
     });
   }
 
   disable(): void {
+    if (this.injectedIcon) {
+      this.injectedIcon.destroy();
+    }
+    this.injectedIcon = null;
     if (this.gestureHandlerId) {
       this.restartGesture?.disconnect(this.gestureHandlerId);
     }
@@ -169,6 +190,15 @@ export default class ExtraRebootOptionsExtension extends Extension {
     this.sourceId = null;
     this.rebootOptions = [];
     this.loginManager = undefined;
+  }
+
+  getIcon(name: string): Gio.Icon | undefined {
+    let file = this.dir
+      .get_child('data')
+      .get_child('icons')
+      .get_child(`${name}.svg`)
+      .get_path();
+    return file ? Gio.Icon.new_for_string(file) : undefined;
   }
 
   private getPowerSettingsMenu(
@@ -277,21 +307,6 @@ export default class ExtraRebootOptionsExtension extends Extension {
 
       container.set_child(optionsContainer);
       dialog.contentLayout.add_child(container);
-
-      // Separator (borrowed from quick settings):
-      let separator = new St.Bin({
-        styleClass: 'popup-separator-menu-item',
-        xExpand: true,
-      });
-      separator.set_child(
-        new St.Widget({
-          styleClass: 'popup-separator-menu-item-separator',
-          xExpand: true,
-          yExpand: true,
-          yAlign: Clutter.ActorAlign.CENTER,
-        }),
-      );
-      dialog.contentLayout.add_child(separator);
     }
 
     dialog.addButton({

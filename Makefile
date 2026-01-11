@@ -15,11 +15,12 @@ dist/extension.js: node_modules/.package-lock.json src/*.ts
 	# tsc strips line breaks in emitted js - need to add back for EGO review
 	npx eslint dist --config format.eslint.config.js --fix
 
-out/$(BUNDLE_ZIP): dist/extension.js dist/metadata.json dist/po/* README.md LICENSE
+out/$(BUNDLE_ZIP): dist/extension.js dist/metadata.json dist/po/* dist/data/* README.md LICENSE
 	@-mkdir out
 	gnome-extensions pack dist \
 		--force \
 		--podir="./po" \
+		--extra-source="./data" \
 		--extra-source="../README.md" \
 		--extra-source="../LICENSE" \
 		-o out
